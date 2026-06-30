@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>MindedOS</RootNamespace>
+    <AssemblyName>MindedOS</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="9.0.0" />
+    <PackageReference Include="brainflow" Version="5.22.2" GeneratePathProperty="true" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.0" />
+    <PackageReference Include="PDFsharp-MigraDoc-GDI" Version="6.2.4" />
+    <PackageReference Include="PdfPig" Version="0.1.9" />
+  </ItemGroup>
+
+  <!-- BrainFlow ships its native libs flat in lib/ (not runtimes/<rid>/native/),
+       so they aren't auto-copied. Place them next to the executable; the C#
+       binding P/Invokes BoardController/DataHandler/MLModule + their deps. -->
+  <ItemGroup>
+    <None Include="$(Pkgbrainflow)\lib\*.dll" Link="%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Ship the lexicon, actions and sample programs next to the executable. -->
+  <ItemGroup>
+    <None Include="..\..\actions.txt" Link="data\actions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <!-- All bundled CSVs live in the project data\ folder. They ship encrypted
+         (X.encrypted.csv) and are decrypted at runtime via FileCrypto/DataFile. -->
+    <None Include="..\..\data\*.csv" Link="data\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\programs\**\*.json" Link="programs\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\icons\**\*.*" Link="icons\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\sequences\**\*.json" Link="sequences\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

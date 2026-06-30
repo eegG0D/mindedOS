@@ -1,0 +1,107 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MindedOS.Shell.MainWindow"
+        Title="mindedOS" Height="760" Width="1180"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Ink}"
+        KeyDown="OnKeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== Top bar ===== -->
+        <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="16,10">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE945;" FontFamily="{StaticResource FluentIcons}"
+                               FontSize="22" Foreground="{StaticResource Teal}" Margin="0,0,10,0"/>
+                    <TextBlock Text="mindedOS" FontSize="22" FontWeight="Bold"/>
+                    <TextBlock Text="BCI" FontSize="12" FontWeight="Bold" Margin="8,6,0,0"
+                               Foreground="{StaticResource Teal}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="ConnectBtn" Content="Connect" Click="OnConnect" Margin="0,0,8,0"/>
+                    <Button x:Name="BaselineBtn" Content="Re-run Baseline" Click="OnRunBaseline" Margin="0,0,8,0"/>
+                    <Button x:Name="SafeModeBtn" Content="Safe Mode: ON" Click="OnToggleSafeMode" Margin="0,0,8,0"/>
+                    <Button Style="{StaticResource GlyphButton}" Content="&#xE740;"
+                            ToolTip="Fullscreen (F11)" Click="OnToggleFullscreen"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== Desktop (paged icon grid + arrows) ===== -->
+        <Grid Grid.Row="1">
+            <ItemsControl x:Name="IconHost" Margin="80,24">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" Rows="3"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+
+            <!-- photo-viewer style arrows -->
+            <Button x:Name="PrevBtn" Style="{StaticResource GlyphButton}" Content="&#xE76B;"
+                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0"
+                    Click="OnPrevPage" ToolTip="Previous screen"/>
+            <Button x:Name="NextBtn" Style="{StaticResource GlyphButton}" Content="&#xE76C;"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="16,0"
+                    Click="OnNextPage" ToolTip="Next screen"/>
+
+            <!-- page dots -->
+            <ItemsControl x:Name="PageDots" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,12">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+
+        <!-- ===== Status bar ===== -->
+        <Border Grid.Row="2" Background="{StaticResource Panel}" Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <WrapPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse x:Name="StateDot" Width="12" Height="12" Fill="{StaticResource TextMuted}" Margin="0,0,8,2"/>
+                    <TextBlock x:Name="StateText" Text="Idle" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="ProfileText" Text="Profile: —" Margin="0,0,16,2"/>
+                    <TextBlock x:Name="AttentionText" Text="Focus: —" Margin="0,0,16,2" Foreground="{StaticResource Focus}"/>
+                    <TextBlock x:Name="MeditationText" Text="Calm: —" Margin="0,0,16,2" Foreground="{StaticResource Teal}"/>
+                    <TextBlock x:Name="SignalText" Text="Signal: —" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="BlinkText" Text="Blink: —" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="RawText" Text="Raw: —" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="BandText" Text="δ— θ— α— β— γ—" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="WordText" Text="word: —" Margin="0,0,16,2"/>
+                    <TextBlock x:Name="RawChannelsText" Text="Raw (16ch): —" Margin="0,0,16,2" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock x:Name="ChannelWordsText" Text="Words (16ch): —" Margin="0,0,16,2"/>
+                </WrapPanel>
+                <TextBlock x:Name="LogText" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="16,0,0,0" Foreground="{StaticResource TextMuted}" Text=""/>
+            </Grid>
+        </Border>
+
+        <!-- ===== Baseline overlay ===== -->
+        <Grid x:Name="BaselineOverlay" Grid.RowSpan="3" Background="#F2FFFFFF" Visibility="Collapsed">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="460">
+                <TextBlock Text="&#xE9D9;" FontFamily="{StaticResource FluentIcons}" FontSize="48"
+                           Foreground="{StaticResource Teal}" HorizontalAlignment="Center"/>
+                <TextBlock Text="Recording your baseline" FontSize="24" FontWeight="Bold"
+                           HorizontalAlignment="Center" Margin="0,16,0,4"/>
+                <TextBlock x:Name="BaselineSub" TextAlignment="Center" Foreground="{StaticResource TextMuted}"
+                           TextWrapping="Wrap"
+                           Text="Sit comfortably for 5 minutes while mindedOS learns your resting brain state."/>
+                <ProgressBar x:Name="BaselineProgress" Minimum="0" Maximum="1" Value="0" Margin="0,24,0,8"/>
+                <TextBlock x:Name="BaselineTime" HorizontalAlignment="Center" Foreground="{StaticResource TextMuted}"/>
+                <Button x:Name="BaselineCancel" Content="Cancel" HorizontalAlignment="Center"
+                        Margin="0,16,0,0" Click="OnCancelBaseline"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

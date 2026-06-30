@@ -1,0 +1,334 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MindedOS.Shell.SubProgramWindow"
+        Title="Sub-program" Height="560" Width="540"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource Ink}"
+        KeyDown="OnKeyDown">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource Panel}" Padding="16,12">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="HeaderImage" Width="40" Height="40" Margin="0,0,12,0"
+                       Stretch="Uniform" Visibility="Collapsed"/>
+                <TextBlock x:Name="HeaderGlyph" FontFamily="{StaticResource FluentIcons}"
+                           FontSize="26" Foreground="{StaticResource Teal}" Margin="0,0,12,0"/>
+                <StackPanel>
+                    <TextBlock x:Name="HeaderName" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock x:Name="HeaderProfiles" Foreground="{StaticResource TextMuted}" FontSize="12"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- AI Application panel (shown only when the program declares aiApp) -->
+        <Border x:Name="AiPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock x:Name="AiAddressLabel" Text="Output folder / address:" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextMuted}" Margin="0,0,8,0"/>
+                    <TextBox x:Name="AiAddress" Width="360"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="AiStartButton" Content="▶ BEGIN 3-MIN EEG → GENERATE"
+                            Click="OnAiStart" Margin="0,0,12,0"/>
+                    <Button x:Name="AiOpenFolder" Content="Open output folder"
+                            Click="OnAiOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="AiProgress" Minimum="0" Maximum="1" Value="0" Margin="0,10,0,6"/>
+                <TextBlock x:Name="AiStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Accumulates 3 minutes of EEG-to-words, then asks LM Studio to generate an army-themed Python app."/>
+                <TextBox x:Name="AiResult" Margin="0,8,0,0" MaxHeight="160"
+                         IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Artificial Life panel (shown only when the program declares artLife) -->
+        <Border x:Name="ArtLifePanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="CpuEegButton" Content="① CREATE CPU EEG CSV"
+                            Click="OnCreateCpuEeg" Margin="0,0,12,0"/>
+                    <Button x:Name="ScanCompareButton" Content="② SCAN MY EEG &amp; COMPARE"
+                            Click="OnScanCompare" Margin="0,0,12,0"/>
+                    <Button x:Name="ArtLifeOpenFolder" Content="Open folder" Click="OnArtLifeOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="ArtLifeProgress" Minimum="0" Maximum="1" Value="0" Margin="0,10,0,6"/>
+                <TextBlock x:Name="ArtLifeStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Step 1: record this computer's EEG to cpu_eeg.csv. Step 2: scan your EEG and compare."/>
+                <TextBlock x:Name="ArtLifeResult" FontSize="22" FontWeight="Bold"
+                           Foreground="{StaticResource Focus}" Margin="0,8,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Artificial Neural Network panel (shown only when the program declares network) -->
+        <Border x:Name="NetPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Your handle:" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextMuted}" Margin="0,0,8,0"/>
+                    <TextBox x:Name="NetName" Width="180" Margin="0,0,12,0"/>
+                    <Button x:Name="NetRecordButton" Content="① RECORD MY EEG (3 MIN)"
+                            Click="OnNetRecord" Margin="0,0,12,0"/>
+                    <Button x:Name="NetRankButton" Content="② SCAN NETWORK &amp; RANK"
+                            Click="OnNetRank" Margin="0,0,12,0"/>
+                    <Button x:Name="NetOpenFolder" Content="Open folder" Click="OnNetOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="NetProgress" Minimum="0" Maximum="1" Value="0" Margin="0,0,0,6"/>
+                <TextBlock x:Name="NetStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Drop other users' EEG CSVs in the folder (one per user). Record yours, then rank the network."/>
+                <ListBox x:Name="NetLeaderboard" MaxHeight="150" Margin="0,8,0,0"
+                         FontFamily="Consolas" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Artificial Noosphere panel (shown only when the program declares noosphere) -->
+        <Border x:Name="NoosPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Your handle:" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextMuted}" Margin="0,0,8,0"/>
+                    <TextBox x:Name="NoosName" Width="160" Margin="0,0,12,0"/>
+                    <Button x:Name="NoosRecordButton" Content="① ADD MY EEG (3 MIN)"
+                            Click="OnNoosRecord" Margin="0,0,12,0"/>
+                    <Button x:Name="NoosScanButton" Content="② SCAN &amp; ASSIGN ROLES"
+                            Click="OnNoosScan" Margin="0,0,12,0"/>
+                    <Button x:Name="NoosOpenFolder" Content="Open folder" Click="OnNoosOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="NoosProgress" Minimum="0" Maximum="1" Value="0" Margin="0,0,0,6"/>
+                <TextBlock x:Name="NoosStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Drop hundreds of EEG CSVs (one per node) in the folder, then scan to build the noosphere and assign roles."/>
+                <ListBox x:Name="NoosRoster" MaxHeight="150" Margin="0,8,0,0"
+                         FontFamily="Consolas" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- EEG vehicle game panel (shown only when the program declares vehicle) -->
+        <Border x:Name="VehiclePanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="DriveButton" Content="🚗 DRIVE WITH YOUR EEG" Click="OnOpenVehicleGame" Margin="0,0,12,0"/>
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource TextMuted}"
+                           Text="Opens the top-down street game; your live EEG steers the car via eeg_map_vehicle.csv."/>
+            </StackPanel>
+        </Border>
+
+        <!-- Brain-Machine-Interface game panel (shown only when the program declares bmi) -->
+        <Border x:Name="BmiPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="BmiPlayButton" Content="🎮 PLAY (EEG)" Click="OnOpenBmiGame" Margin="0,0,12,0"/>
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource TextMuted}"
+                           Text="Move a character in 4 directions with live EEG (collect targets), or replay a recorded CSV. With no CSV it records 5-min files until you exit."/>
+            </StackPanel>
+        </Border>
+
+        <!-- Big Data profession analyzer panel (shown only when the program declares bigData) -->
+        <Border x:Name="BigDataPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="BdRecordButton" Content="① RECORD BIG DATA (4 h)" Click="OnBdRecord" Margin="0,0,12,0"/>
+                    <Button x:Name="BdLoadButton" Content="② LOAD FILE &amp; ANALYZE" Click="OnBdLoad" Margin="0,0,12,0"/>
+                    <Button x:Name="BdAiMapButton" Content="AI: GENERATE PROFESSION MAP" Click="OnBdAiMap" Margin="0,0,12,0"/>
+                    <Button x:Name="BdOpenFolder" Content="Open folder" Click="OnBdOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="BdProgress" Minimum="0" Maximum="1" Value="0" Margin="0,0,0,6"/>
+                <TextBlock x:Name="BdStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Record a long (4 h+) EEG file, then load it to compute the top professions from your most-frequent decoded words."/>
+                <ListBox x:Name="BdResults" MaxHeight="150" Margin="0,8,0,0"
+                         FontFamily="Consolas" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Black Box Learning panel (shown only when the program declares blackBox) -->
+        <Border x:Name="BlackBoxPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="Subject:" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextMuted}" Margin="0,0,8,0"/>
+                    <TextBox x:Name="BbSubject" Width="180" Margin="0,0,12,0"/>
+                    <Button x:Name="BbStudyButton" Content="① STUDY 32 MIN (RECORD)" Click="OnBbStudy" Margin="0,0,12,0"/>
+                    <Button x:Name="BbLoadButton" Content="② LOAD CSV &amp; ANALYZE" Click="OnBbLoad" Margin="0,0,12,0"/>
+                    <Button x:Name="BbReportButton" Content="AI: LEARNING REPORT" Click="OnBbReport" Margin="0,0,12,0"/>
+                    <Button x:Name="BbOpenFolder" Content="Open folder" Click="OnBbOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="BbProgress" Minimum="0" Maximum="1" Value="0" Margin="0,0,0,6"/>
+                <TextBlock x:Name="BbStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Study a subject for 32 minutes (①), then load the CSV (②) to see how focused you learned."/>
+                <ListBox x:Name="BbResults" MaxHeight="160" Margin="0,8,0,0"
+                         FontFamily="Consolas" Visibility="Collapsed"/>
+                <TextBox x:Name="BbReport" Margin="0,8,0,0" MaxHeight="120" IsReadOnly="True"
+                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- EEG chatbot panel (shown only when the program declares chatbot) -->
+        <Border x:Name="ChatPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="ChatStartButton" Content="▶ START CHAT (read my EEG)" Click="OnChatToggle" Margin="0,0,12,0"/>
+                    <TextBlock x:Name="ChatStatus" VerticalAlignment="Center" Foreground="{StaticResource TextMuted}"
+                               Text="The bot reads your decoded EEG words and improvises a reply to each."/>
+                </StackPanel>
+                <TextBox x:Name="ChatLog" MinHeight="120" MaxHeight="200" IsReadOnly="True"
+                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                         FontFamily="Segoe UI" FontSize="13"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Choice Descriptor panel (shown only when the program declares choices) -->
+        <Border x:Name="ChoicePanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="ChRecordButton" Content="① RECORD CHOICES (10 MIN)" Click="OnChRecord" Margin="0,0,12,0"/>
+                    <Button x:Name="ChProcessButton" Content="② PROCESS CSV (LM Studio)" Click="OnChProcess" Margin="0,0,12,0"/>
+                    <Button x:Name="ChOpenFolder" Content="Open folder" Click="OnChOpenFolder"/>
+                </StackPanel>
+                <ProgressBar x:Name="ChProgress" Minimum="0" Maximum="1" Value="0" Margin="0,0,0,6"/>
+                <TextBlock x:Name="ChStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Record 10 minutes of EEG-mapped choices (①), then process the CSV with LM Studio (②) — or process a stored CSV."/>
+                <ListBox x:Name="ChResults" MaxHeight="120" Margin="0,8,0,0" FontFamily="Consolas" Visibility="Collapsed"/>
+                <TextBox x:Name="ChDescription" Margin="0,8,0,0" MaxHeight="120" IsReadOnly="True"
+                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Data Ingestion panel (shown only when the program declares dataIngest) -->
+        <Border x:Name="DataPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Teal}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="DiLoadButton" Content="① SCAN FOLDER (CSV files)" Click="OnDiLoad" Margin="0,0,12,0"/>
+                    <Button x:Name="DiSummarizeButton" Content="② TITLE EACH (EEG + LM Studio)" Click="OnDiSummarize" Margin="0,0,12,0"/>
+                    <Button x:Name="DiOpenFolder" Content="Open folder" Click="OnDiOpenFolder"/>
+                </StackPanel>
+                <TextBlock x:Name="DiStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Scan the folder for CSV files (①) — each is streamed and profiled — then write an EEG-based one-phrase title for each with LM Studio (②)."/>
+                <ListBox x:Name="DiProfile" MaxHeight="100" Margin="0,8,0,0" FontFamily="Consolas" Visibility="Collapsed"/>
+                <ListBox x:Name="DiSummary" MaxHeight="120" Margin="0,8,0,0" FontFamily="Consolas" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Decision panel (shown only when the program declares decision) -->
+        <Border x:Name="DecisionPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="DcScanButton" Content="① SCAN PDFs (folder)" Click="OnDcScan" Margin="0,0,12,0"/>
+                    <Button x:Name="DcDecideButton" Content="② DECIDE (EEG + LM Studio)" Click="OnDcDecide" Margin="0,0,12,0"/>
+                    <Button x:Name="DcOpenFolder" Content="Open folder" Click="OnDcOpenFolder"/>
+                </StackPanel>
+                <TextBlock x:Name="DcStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Put PDFs in the folder, scan them (①), then let your EEG decide what to do with each — LM Studio reads each file and rewrites your brain into a decision (②)."/>
+                <ListBox x:Name="DcResults" MaxHeight="170" Margin="0,8,0,0" FontFamily="Consolas" Visibility="Collapsed"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="AssistPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="AsOfferButton" Content="✨ GET 3 OFFERS (read my EEG)" Click="OnAssistOffer" Margin="0,0,12,0"/>
+                    <Button x:Name="AsTryAgainButton" Content="↻ TRY AGAIN" Click="OnAssistOffer" Visibility="Collapsed"/>
+                </StackPanel>
+                <TextBlock x:Name="AsStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Press GET 3 OFFERS — the assistant reads 3 EEG readings, matches each to eeg_map_assist.csv, and offers you 3 services. Press TRY AGAIN for 3 new offers."/>
+                <ItemsControl x:Name="AsResults" Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource Panel}" CornerRadius="6" Padding="12,8" Margin="0,0,0,6">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Service}" Foreground="{StaticResource TextBright}"
+                                               FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Detail}" Foreground="{StaticResource Teal}" FontSize="11"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="IotPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <TextBlock Text="COM port:" Foreground="{StaticResource TextBright}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox x:Name="IotPortBox" Width="110" Margin="0,0,8,0"/>
+                    <Button x:Name="IotRefresh" Content="↻" Click="OnIotRefresh" Margin="0,0,8,0"/>
+                    <Button x:Name="IotConnect" Content="Connect robot" Click="OnIotConnect" Margin="0,0,12,0"/>
+                    <Button x:Name="IotStream" Content="▶ START CONTROL" Click="OnIotStream"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="Command:" Foreground="{StaticResource TextBright}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="IotCommand" Text="—" Foreground="{StaticResource Focus}" FontSize="22" FontWeight="Bold"/>
+                </StackPanel>
+                <TextBlock x:Name="IotStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="Pick your robot's Bluetooth COM port, Connect, then START CONTROL — your live EEG is matched to eeg_map_iot.csv and the command (LEFT/RIGHT/UP/DOWN…) is streamed to the robot."/>
+                <ListBox x:Name="IotLog" MaxHeight="150" Margin="0,8,0,0" FontFamily="Consolas"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="MemoryPanel" Grid.Row="1" Background="{StaticResource PanelRaised}"
+                BorderBrush="{StaticResource Focus}" BorderThickness="0,0,0,2"
+                Padding="16,10" Visibility="Collapsed">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button x:Name="MemRecordButton" Content="① RECORD EEG → memory" Click="OnMemRecord" Margin="0,0,12,0"/>
+                    <Button x:Name="MemAssignButton" Content="② ASSIGN COMMANDS (LM Studio)" Click="OnMemAssign" Margin="0,0,12,0"/>
+                    <Button x:Name="MemLoadButton" Content="③ LOAD CSV" Click="OnMemLoad" Margin="0,0,12,0"/>
+                    <Button x:Name="MemOpenFolder" Content="Open folder" Click="OnMemOpenFolder"/>
+                </StackPanel>
+                <TextBlock x:Name="MemStatus" Foreground="{StaticResource TextBright}" TextWrapping="Wrap"
+                           Text="① records your EEG into a 2-column memory (raw_eeg,word). ② lets LM Studio write a command per row (column C). ③ loads a recorded CSV — 3-column (raw_eeg,word,command) or 2-column where you wrote commands in column B."/>
+                <ListBox x:Name="MemList" MaxHeight="170" Margin="0,8,0,0" FontFamily="Consolas"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Grid x:Name="FormHost" Margin="16"/>
+        </ScrollViewer>
+
+        <Border Grid.Row="3" Background="{StaticResource Panel}" Padding="16,8">
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock x:Name="LiveFocus" Foreground="{StaticResource Focus}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveCalm" Foreground="{StaticResource Teal}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveSignal" Foreground="{StaticResource TextMuted}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveBlink" Foreground="{StaticResource TextMuted}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveRaw" Foreground="{StaticResource TextMuted}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveBands" Foreground="{StaticResource TextMuted}" Margin="0,0,16,2"/>
+                <TextBlock x:Name="LiveWord" Margin="0,0,16,2"/>
+                <TextBlock x:Name="SeqStatus" Foreground="{StaticResource Focus}" FontWeight="SemiBold"/>
+            </WrapPanel>
+        </Border>
+    </Grid>
+</Window>
